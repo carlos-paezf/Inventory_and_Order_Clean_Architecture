@@ -1,0 +1,2 @@
+class InventorySeedException(Exception):
+    pass
