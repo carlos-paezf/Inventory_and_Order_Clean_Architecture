@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict
+from typing import Any
 from domain.entities.product import AccessoryProduct, BookProduct, Product
 
 
@@ -11,7 +11,7 @@ class ProductFactory:
     haciendo uso del patrón Factory Method
     """
     @staticmethod
-    def create_product(kind: str, **kwargs: Dict[str, Any]) -> Product:
+    def create_product(kind: str, **kwargs: Any) -> Product:
         """
         Description
         -----------
@@ -21,7 +21,7 @@ class ProductFactory:
         ----------
         kind: str
             Tipo de producto a crear
-        **kwargs: Dict[str, Any]
+        **kwargs: Any
             Parámetros adicionales para crear el producto
         
         Returns
