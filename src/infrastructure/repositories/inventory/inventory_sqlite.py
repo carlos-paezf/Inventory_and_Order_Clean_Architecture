@@ -106,9 +106,7 @@ class InventorySQLiteRepository(InventoryRepository):
         """
         result = self.conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
         self.conn.commit()
-        if result.rowcount == 0:
-            raise ProductNotFoundError(product_id)
-        return True
+        return result.rowcount > 0
         
 
 

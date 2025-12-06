@@ -99,7 +99,7 @@ class OrderSQLiteRepository(OrderRepository):
         self.conn.execute("DELETE FROM order_items WHERE order_id = ?", (order_id,))
         result = self.con.execute("DELETE FROM orders WHERE id = ?", (order_id,))
         self.conn.commit()
-        return result.rowcount >= 0
+        return result.rowcount > 0
     
     
     def get(self, order_id: str) -> Order | None:

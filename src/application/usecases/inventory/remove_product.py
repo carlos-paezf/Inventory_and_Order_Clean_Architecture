@@ -32,16 +32,16 @@ class RemoveProductUseCase:
         Returns
         -------
         bool
-            Retorna True si el producto fue eliminado, False en caso contrario.
+            True si el producto fue eliminado, False si no.
 
         Raises
         ------
+        ProductNotFoundError
+            Si el producto no se encuentra en la persistencia.
         ValueError
             Si ocurre un error al eliminar el producto.
         """
         try:
             return self.inventory_repo.remove_product(product_id)
-        except ProductNotFoundError as e:
-            raise ProductNotFoundError(e.product_id)
         except ValueError as e:
             raise InventoryError(str(e))
