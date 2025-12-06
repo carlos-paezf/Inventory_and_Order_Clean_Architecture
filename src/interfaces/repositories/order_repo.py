@@ -51,7 +51,7 @@ class OrderRepository(ABC):
         
         Returns
         -------
-        List[Order] | None
+        Order | None
             Lista de ordenes si se encontró, None si no se encontró.
         """
         pass
