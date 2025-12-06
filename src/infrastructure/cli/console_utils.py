@@ -12,6 +12,8 @@ RESET = "\033[0m"
 
 def pause() -> None:
     input(f"{MAGENTA}\nPresiona Enter para volver al menú...{RESET}")
+    print("\n", "-" * 100)
+
 
 
 def show_menu_options(options: Sequence[str], exit_label: str = "Salir de la demo") -> None:
