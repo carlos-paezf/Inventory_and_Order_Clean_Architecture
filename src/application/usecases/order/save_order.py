@@ -5,10 +5,20 @@ from interfaces.repositories.order_repo import OrderRepository
 
 class SaveOrderUseCase:
     def __init__(self, order_repo: OrderRepository):
+        """
+        Description
+        -----------
+        Inicializa el caso de uso Guardar orden.
+
+        Attributes
+        ----------
+        order_repo : OrderRepository
+            Instancia activa del repositorio.
+        """
         self.order_repo = order_repo
 
     
-    def execute(self, order: Order):
+    def execute(self, order: Order) -> None:
         """
         Description
         -----------

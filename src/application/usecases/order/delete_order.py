@@ -16,7 +16,8 @@ class DeleteOrderUseCase:
         """
         self.order_repo = order_repo
 
-    def execute(self, order_id: str):
+
+    def execute(self, order_id: str) -> None:
         """
         Description
         -----------
@@ -25,7 +26,9 @@ class DeleteOrderUseCase:
 
         Raise
         -----
-        Exception
+        OrderNotFoundError
+            Si la orden no existe.
+        OrderError
             Si ocurre un error al eliminar la orden.
         """
         try:
