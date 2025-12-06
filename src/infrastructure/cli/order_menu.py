@@ -1,23 +1,51 @@
 import random
 
-from application.usecases.order.list_all import ListAllOrdersUseCase
-from application.usecases.order.save import SaveOrderUseCase
-from application.usecases.order.delete import DeleteOrderUseCase
-from application.usecases.order.get import GetOrderUseCase
+from application.usecases.order.list_all_orders import ListAllOrdersUseCase
+from application.usecases.order.save_order import SaveOrderUseCase
+from application.usecases.order.delete_order import DeleteOrderUseCase
+from application.usecases.order.get_order import GetOrderUseCase
 
-from demo.mocks.orders import MOCKS_ORDERS
-from interfaces.cli.console_utils import (
-    GREEN, RESET,
+from infrastructure.cli.console_utils import (
+    GREEN, MAGENTA, RESET,
     pause, show_menu_options, read_option
 )
+
+from demo.mocks.orders import MOCKS_ORDERS
 from interfaces.repositories.order_repo import OrderRepository
 
 
 class OrderMenu:
+    """
+    Description
+    -----------
+    Clase que gestiona el menú de las ordenes.
+
+    Attributes
+    ----------
+    order_repo : OrderRepository
+        Repositorio de ordenes.
+    """
+    
     def __init__(self, order_repo: OrderRepository) -> None:
+        """
+        Description
+        -----------
+        Inicializa el menú de las ordenes.
+
+        Parameters
+        ----------
+        order_repo : OrderRepository
+            Repositorio de ordenes.
+        """
         self.order_repo = order_repo
 
+
     def run(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el menú de las ordenes.
+        """
         while True:
             print(
                 f"{GREEN}\nTe presentamos las acciones disponibles para las ordenes:"
@@ -51,27 +79,59 @@ class OrderMenu:
 
 
     def _create_order(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el caso de uso `Guardar Orden`.
+        """
+        # TODO: Añadir el flujo de inserción manual de ordenes
         random_order = random.choice(MOCKS_ORDERS)
         SaveOrderUseCase(self.order_repo).execute(random_order)
+        print(f"La orden {random_order.id} ha sido guardada con éxito")
         print(f"{GREEN}\nCaso de uso `Guardar Orden` ha sido ejecutado{RESET}")
 
 
     def _get_order(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el caso de uso `Obtener Orden`.
+        """
         order_id = input(
             f"{MAGENTA}>>>{RESET} Ingrese el id de la orden a consultar: "
         )
-        GetOrderUseCase(self.order_repo).execute(order_id)
+        order = GetOrderUseCase(self.order_repo).execute(order_id)
+        print(order if order else f"No se encontró la orden con el id {order_id}")
         print(f"{GREEN}\nCaso de uso `Obtener Orden` ha sido ejecutado{RESET}")
 
 
     def _list_orders(self) -> None:
-        ListAllOrdersUseCase(self.order_repo).execute()
+        """
+        Description
+        -----------
+        Ejecuta el caso de uso `Listar Ordenes`.
+        """
+        orders = ListAllOrdersUseCase(self.order_repo).execute()
+        if len(orders) == 0:
+            print("No se encontraron ordenes")
+        else:
+            for order in orders:
+                print(order, end="\n\n")
         print(f"{GREEN}\nCaso de uso `Listar Ordenes` ha sido ejecutado{RESET}")
 
 
     def _delete_order(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el caso de uso `Eliminar Orden`.
+        """
         order_id = input(
             f"{MAGENTA}>>>{RESET} Ingrese el id de la orden a eliminar: "
         )
-        DeleteOrderUseCase(self.order_repo).execute(order_id)
+        deleted = DeleteOrderUseCase(self.order_repo).execute(order_id)
+        if deleted:
+            print(f"La orden {order_id} ha sido eliminada con éxito")
+        else:
+            print(f"No se encontró la orden con el id {order_id}")
         print(f"{GREEN}\nCaso de uso `Eliminar Orden` ha sido ejecutado{RESET}")
