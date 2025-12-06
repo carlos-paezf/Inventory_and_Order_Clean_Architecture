@@ -3,6 +3,7 @@ from typing import Dict, List
 from domain.entities.order import Order
 from domain.entities.product import Product
 
+from domain.exceptions.order_exceptions import OrderAlreadyExists
 from interfaces.repositories.order_repo import OrderRepository
 
 
@@ -27,7 +28,7 @@ class OrderMemoryRepository(OrderRepository):
         self._orders: Dict[str, Order] = {}
 
 
-    def save(self, order: Product) -> None:
+    def save(self, order: Order) -> None:
         """
         Description
         -----------
@@ -35,11 +36,16 @@ class OrderMemoryRepository(OrderRepository):
 
         Attributes
         ----------
-        order : Product
+        order : Order
             Orden a guardar
+
+        Raise
+        -----
+        OrderAlreadyExists
+            Si la orden ya existe
         """
         if order.id in self._orders:
-            raise ValueError(f"409 - Ya existe una orden con el id {order.id}")
+            raise OrderAlreadyExists(order.id)
         self._orders[order.id] = order
 
 
