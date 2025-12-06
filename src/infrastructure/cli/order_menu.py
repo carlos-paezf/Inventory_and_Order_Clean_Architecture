@@ -1,5 +1,4 @@
-import random
-
+from application.usecases.inventory.get_product import GetProductUseCase
 from application.usecases.order.list_all_orders import ListAllOrdersUseCase
 from application.usecases.order.save_order import SaveOrderUseCase
 from application.usecases.order.delete_order import DeleteOrderUseCase
@@ -7,11 +6,11 @@ from application.usecases.order.get_order import GetOrderUseCase
 
 from domain.entities.order import Order
 from infrastructure.cli.console_utils import (
-    GREEN, MAGENTA, RESET, capture_order,
-    pause, show_menu_options, read_option
+    GREEN, MAGENTA, RESET, 
+    pause, show_menu_options, read_option,
+    capture_order_id, capture_product_id, capture_quantity
 )
 
-from demo.mocks.orders import MOCKS_ORDERS
 from interfaces.adapters.order_presenter import OrderPresenter
 from interfaces.repositories.inventory_repo import InventoryRepository
 from interfaces.repositories.order_repo import OrderRepository
@@ -88,10 +87,42 @@ class OrderMenu:
         -----------
         Ejecuta el caso de uso `Guardar Orden`.
         """
-        order = capture_order(self.inventory_repo)
-        SaveOrderUseCase(self.order_repo).execute(order)
-        print(f"La orden {order.id} ha sido guardada con éxito")
-        print(f"{GREEN}\nCaso de uso `Guardar Orden` ha sido ejecutado{RESET}")
+        order_id = capture_order_id()
+        order = Order(id=order_id)
+
+        while True:
+            print(
+                f"{GREEN}\nAgregar productos a la orden:{RESET} (Selecciona una opción)"
+            )
+            options = [
+                "Agregar producto existente",
+                "Finalizar orden",
+                "Cancelar orden",
+            ]
+            show_menu_options(options, exit_label="Salir de la demo")
+            option = read_option(len(options))
+
+            if option == 1:
+                product_id = capture_product_id("Ingrese el id del producto: ")
+
+                product = GetProductUseCase(self.inventory_repo).execute(product_id)
+                if not product:
+                    print(f"{RED}Error:{RESET} No se encontró el producto con el id {product_id}")
+                    print(f"{YELLOW}Nota:{RESET} Cree el producto primero en el módulo de inventario.")
+                    continue
+
+                quantity = capture_quantity()
+                order.add_item(product, quantity)
+
+            elif option == 2:
+                SaveOrderUseCase(self.order_repo).execute(order)
+                print(f"La orden {order.id} ha sido guardada con éxito")
+                print(f"{GREEN}\nCaso de uso `Guardar Orden` ha sido ejecutado{RESET}")
+                return
+
+            elif option == 3:
+                print(f"{YELLOW}Orden cancelada.{RESET}")
+                return
 
 
     def _get_order(self) -> None:
