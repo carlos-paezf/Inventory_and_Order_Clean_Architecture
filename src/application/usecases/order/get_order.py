@@ -1,4 +1,3 @@
-from typing import List
 from domain.entities.order import Order
 from domain.exceptions.order_exceptions import OrderError
 from interfaces.repositories.order_repo import OrderRepository
@@ -19,7 +18,7 @@ class GetOrderUseCase:
         self.order_repo = order_repo
 
 
-    def execute(self, order_id: str) -> List[Order] | None:
+    def execute(self, order_id: str) -> Order | None:
         """
         Description
         -----------
@@ -32,8 +31,8 @@ class GetOrderUseCase:
         
         Returns
         -------
-        List[Order] | None
-            Lista de ordenes si se encontró, None si no se encontró.
+        Order | None
+            Retorna la orden si se encontró. None en caso contrario.
         """
         try:
             return self.order_repo.get(order_id)
