@@ -187,6 +187,6 @@ class OrderSQLiteRepository(OrderRepository):
         """
         product_id, _, product_name, price, category, author, brand = row
 
-        return ProductFactory().create_product(
+        return ProductFactory.create_product(
             kind=category, id=product_id, name=product_name, price=float(price), author=author, brand=brand
         )
