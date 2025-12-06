@@ -7,7 +7,6 @@ class NotTested:
         repository: InventoryRepository
 
         def tearDown(self):
-            self.repository.dispose()
             self.repository = None
 
         def test_add_product(self):
