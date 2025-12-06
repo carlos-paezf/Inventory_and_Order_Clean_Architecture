@@ -3,6 +3,8 @@ from interfaces.repositories.inventory_repo import InventoryRepository
 from demo.mocks.products import MOCKS_PRODUCTS
 
 class TestInventoryRepository(unittest.TestCase):
+    repository: InventoryRepository
+
     def tearDown(self):
         self.repository.dispose()
         self.repository = None
@@ -35,7 +37,7 @@ class TestInventoryRepository(unittest.TestCase):
 
         isRemoved = self.repository.remove_product(expected.id)
 
-        assertTrue(isRemoved, "failed to remove product")
+        self.assertTrue(isRemoved, "failed to remove product")
 
         self.assertNotIn(expected, self.repository.list_products(), "removed product is still in the list")
 
