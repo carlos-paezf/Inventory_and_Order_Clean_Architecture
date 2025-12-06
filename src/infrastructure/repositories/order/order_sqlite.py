@@ -1,10 +1,11 @@
 from typing import List
 
-from domain.entities.order import Order
+from domain.entities.order import Order, OrderItem
 from domain.entities.product import Product
 
 from infrastructure.sqlite_connection import SQLiteConnection
 
+from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.order_repo import OrderRepository
 
 
@@ -123,8 +124,7 @@ class OrderSQLiteRepository(OrderRepository):
         if not row:
             return None
 
-        order = Order(id=row[0])
-        items = self.conn.execute(
+        items_result = self.conn.execute(
             """
             SELECT 
                 oi.product_id, 
@@ -136,16 +136,18 @@ class OrderSQLiteRepository(OrderRepository):
                 p.brand
             FROM order_items oi
             INNER JOIN products p ON oi.product_id = p.id
-            WHERE order_id = ?
+            WHERE oi.order_id = ?
             """,
             (order_id,)
         )
 
-        for row in items.fetchall():
-            print(row)
-            product = self._map_product(row)
-            order.add_item(product, quantity=row[1])
 
+        items = []
+        for row in items_result.fetchall():
+            product = self._map_product(row)
+            items.append(OrderItem(product, row[1]))
+
+        order = Order(id=row[0], items=items)
         return order
 
     
@@ -167,7 +169,7 @@ class OrderSQLiteRepository(OrderRepository):
         return orders
         
 
-    def _map_product(row: any) -> Product:
+    def _map_product(self, row: any) -> Product:
         """
         Description
         -----------
