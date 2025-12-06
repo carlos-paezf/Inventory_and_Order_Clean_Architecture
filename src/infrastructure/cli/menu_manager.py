@@ -9,7 +9,7 @@ from infrastructure.repositories.inventory.inventory_sqlite import InventorySQLi
 from infrastructure.repositories.order.order_memory import OrderMemoryRepository
 from infrastructure.repositories.order.order_sqlite import OrderSQLiteRepository
 from infrastructure.cli.console_utils import (
-    GREEN, BLUE, RESET,
+    GREEN, BLUE, RESET, clean_console,
     show_menu_options, read_option,
 )
 from infrastructure.cli.inventory_menu import InventoryMenu
@@ -98,6 +98,7 @@ class MenuManager:
         -----------
         Imprime el mensaje de bienvenida.
         """
+        clean_console()
         print(
             f"{GREEN}\n\nBienvenido(a) a la DEMO de inventario y pedidos{RESET}",
             end="\n\n",
@@ -158,6 +159,6 @@ class MenuManager:
             if option == 1:
                 InventoryMenu(self.inventory_repo).run()
             elif option == 2:
-                OrderMenu(self.order_repo).run()
+                OrderMenu(self.order_repo, self.inventory_repo).run()
             
             print("\n", "-" * 100)
