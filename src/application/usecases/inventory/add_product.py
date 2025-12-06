@@ -32,7 +32,5 @@ class AddProductUseCase:
         """
         try:
             self.inventory_repo.add_product(product)
-        except ProductAlreadyExistsError as e:
-            raise ProductAlreadyExistsError(e.product_id)
         except InventoryError as e:
             raise InventoryError(e)
