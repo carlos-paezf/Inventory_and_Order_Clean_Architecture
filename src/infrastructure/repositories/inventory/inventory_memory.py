@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from domain.entities.product import Product
+from domain.exceptions.inventory_exceptions import ProductAlreadyExistsError
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
@@ -37,11 +38,11 @@ class InventoryMemoryRepository(InventoryRepository):
 
         Raises
         ------
-        ValueError
+        ProductAlreadyExistsError
             Si el producto ya existe en el repositorio
         """
         if product.id in self._products:
-            raise ValueError(f"Ya existe un producto con el id {product.id}")
+            raise ProductAlreadyExistsError(product_id)
         self._products[product.id] = product
 
 
