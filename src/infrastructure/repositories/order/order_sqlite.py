@@ -1,14 +1,23 @@
-import sqlite3
 from typing import List
+
 from domain.entities.order import Order
-from domain.entities.product import AccessoryProduct, BookProduct, Product
+from domain.entities.product import Product
+
+from infrastructure.sqlite_connection import SQLiteConnection
+
 from interfaces.repositories.order_repo import OrderRepository
 
 
 class OrderSQLiteRepository(OrderRepository):
-    def __init__(self, db_path: str = "database.db") -> None:
-        self.conn = sqlite3.connect(db_path)
+    def __init__(self) -> None:
+        """
+        Description
+        -----------
+        Inicializa el repositorio en SQLite
+        """
+        self.conn = SQLiteConnection().get_connection()
         self._create_tables()
+
 
     def _create_tables(self) -> None:
         """
@@ -92,11 +101,27 @@ class OrderSQLiteRepository(OrderRepository):
         return result.rowcount >= 0
     
     
-    def get(self, order_id: str) -> List[Order]:
+    def get(self, order_id: str) -> Order | None:
+        """
+        Description
+        -----------
+        Obtiene una orden de la base de datos SQLite
+
+        Attributes
+        ----------
+        order_id : str
+            Identificador de la orden a obtener
+
+        Returns
+        -------
+        Order | None
+            Orden si se encuentra, None si no se encuentra.
+        """
         result = self.conn.execute("SELECT id FROM orders WHERE id = ?", (order_id,))
         row = result.fetchone()
+
         if not row:
-            raise ValueError(f"404 - La orden con el id {order_id} no fue encontrada")
+            return None
 
         order = Order(id=row[0])
         items = self.conn.execute(
@@ -125,6 +150,16 @@ class OrderSQLiteRepository(OrderRepository):
 
     
     def list_all(self) -> List[Order]:
+        """
+        Description
+        -----------
+        Obtiene todas las ordenes de la base de datos
+
+        Returns
+        -------
+        List[Order]
+            Lista de todas las ordenes
+        """
         result = self.conn.execute("SELECT id FROM orders")
         orders = []
         for (order_id, ) in result.fetchall():
@@ -133,13 +168,23 @@ class OrderSQLiteRepository(OrderRepository):
         
 
     def _map_product(row: any) -> Product:
+        """
+        Description
+        -----------
+        Mapea un producto de la base de datos a un objeto Product
+
+        Attributes
+        ----------
+        row : any
+            Resultado de la consulta a la base de datos
+
+        Returns
+        -------
+        Product
+            Producto mapeado
+        """
         product_id, _, product_name, price, category, author, brand = row
 
-        if category.lower() == "book":
-            product = BookProduct(product_id, product_name, float(price), category, author)
-        elif category.lower() == "accessory":
-            product = AccessoryProduct(product_id, product_name, float(price), category, brand)
-        else:
-            product = Product(product_id, product_name, float(price), category)
-        
-        return product
+        return ProductFactory().create_product(
+            kind=category, id=product_id, name=product_name, price=float(price), author=author, brand=brand
+        )

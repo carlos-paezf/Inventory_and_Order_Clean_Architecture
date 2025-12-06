@@ -1,16 +1,35 @@
-import sqlite3
 from typing import Any, List
+
 from domain.entities.product import AccessoryProduct, BookProduct, Product
+
+from infrastructure.sqlite_connection import SQLiteConnection
+
+from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
 class InventorySQLiteRepository(InventoryRepository):
-    def __init__(self, db_path: str = "database.db") -> None:
-        self.conn = sqlite3.connect(db_path)
+    """
+    Description
+    -----------
+    Clase que representa el repositorio de inventario en SQLite
+    """
+    def __init__(self) -> None:
+        """
+        Description
+        -----------
+        Inicializa el repositorio en SQLite
+        """
+        self.conn = SQLiteConnection().get_connection()
         self._create_table()
         
 
     def _create_table(self) -> None:
+        """
+        Description
+        -----------
+        Crea la tabla de productos en SQLite
+        """
         query = """
             CREATE TABLE IF NOT EXISTS products (
                 id TEXT PRIMARY KEY,
@@ -26,6 +45,16 @@ class InventorySQLiteRepository(InventoryRepository):
 
 
     def add_product(self, product: Product) -> None:
+        """
+        Description
+        -----------
+        Inserta un producto en la tabla de productos
+
+        Attributes
+        ----------
+        product : Product
+            Producto a insertar
+        """
         query = """
             INSERT INTO products (id, name, price, category, author, brand) 
             VALUES (?, ?, ?, ?, ?, ?)
@@ -33,17 +62,29 @@ class InventorySQLiteRepository(InventoryRepository):
         author = product.author if isinstance(product, BookProduct) else None
         brand = product.brand if isinstance(product, AccessoryProduct) else None
 
-        try:
-            self.conn.execute(
-                query,
-                (product.id, product.name, product.price, product.category, author, brand)
-            )
-            self.conn.commit()
-        except sqlite3.IntegrityError:
-            raise ValueError(f"500 - Ha ocurrido un error al insertar el producto")
+        self.conn.execute(
+            query,
+            (product.id, product.name, product.price, product.category, author, brand)
+        )
+        self.conn.commit()
 
 
     def remove_product(self, product_id: str) -> bool:
+        """
+        Description
+        -----------
+        Elimina un producto de la tabla de productos
+
+        Attributes
+        ----------
+        product_id : str
+            Id del producto a eliminar
+
+        Returns
+        -------
+        bool
+            Retorna True si el producto fue eliminado, False en caso contrario.
+        """
         result = self.conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
         self.conn.commit()
         return result.rowcount >= 0
@@ -51,6 +92,21 @@ class InventorySQLiteRepository(InventoryRepository):
 
 
     def get_product(self, product_id: str) -> Product | None:
+        """
+        Description
+        -----------
+        Obtiene un producto de la tabla de productos
+
+        Attributes
+        ----------
+        product_id : str
+            Id del producto a obtener
+
+        Returns
+        -------
+        Product | None
+            Retorna el producto si se encuentra, None en caso contrario.
+        """
         query = """
             SELECT id, name, price, category, author, brand
             FROM products
@@ -63,6 +119,16 @@ class InventorySQLiteRepository(InventoryRepository):
 
 
     def list_products(self) -> List[Product]:
+        """
+        Description
+        -----------
+        Obtiene todos los productos de la tabla de productos
+
+        Returns
+        -------
+        List[Product]
+            Retorna una lista de productos.
+        """
         result = self.conn.execute("SELECT id, name, price, category, author, brand FROM products")
         rows = result.fetchall()
 
@@ -72,12 +138,24 @@ class InventorySQLiteRepository(InventoryRepository):
         ]
 
 
-    def _map_result(self, row: Any):
+    def _map_result(self, row: Any) -> Product:
+        """
+        Description
+        -----------
+        Mapea un resultado de la tabla de productos a un objeto Product
+
+        Attributes
+        ----------
+        row : Any
+            Resultado de la consulta a la tabla de productos
+
+        Returns
+        -------
+        Product
+            Retorna el producto mapeado.
+        """
         id, name, price, category, author, brand = row
 
-        if category.lower() == "book":
-            return BookProduct(id, name, float(price), category, author)
-        elif category.lower() == "accessory":
-            return AccessoryProduct(id, name, float(price), category, brand)
-        else:
-            return Product(id, name, float(price), category)
+        return ProductFactory().create_product(
+            kind=category, id=id, name=name, price=float(price), author=author, brand=brand
+        )
