@@ -13,6 +13,7 @@ class OrderRepository(ABC):
         pass
 
     @abstractmethod
+    # TODO: Maybe should not return a list?
     def get(self, order_id: str) -> List[Order] | None:
         pass
 
