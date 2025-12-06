@@ -97,7 +97,7 @@ class OrderSQLiteRepository(OrderRepository):
             False si no se encontró la orden a eliminar.
         """
         self.conn.execute("DELETE FROM order_items WHERE order_id = ?", (order_id,))
-        result = self.con.execute("DELETE FROM orders WHERE id = ?", (order_id,))
+        result = self.conn.execute("DELETE FROM orders WHERE id = ?", (order_id,))
         self.conn.commit()
         return result.rowcount > 0
     
@@ -123,7 +123,7 @@ class OrderSQLiteRepository(OrderRepository):
 
         if not row:
             return None
-
+        
         items_result = self.conn.execute(
             """
             SELECT 
@@ -143,9 +143,9 @@ class OrderSQLiteRepository(OrderRepository):
 
 
         items = []
-        for row in items_result.fetchall():
-            product = self._map_product(row)
-            items.append(OrderItem(product, row[1]))
+        for item_row in items_result.fetchall():
+            product = self._map_product(item_row)
+            items.append(OrderItem(product, item_row[1]))
 
         order = Order(id=row[0], items=items)
         return order
@@ -165,7 +165,9 @@ class OrderSQLiteRepository(OrderRepository):
         result = self.conn.execute("SELECT id FROM orders")
         orders = []
         for (order_id, ) in result.fetchall():
-            orders.append(self.get(order_id))
+            order = self.get(order_id)
+            if order is not None:
+                orders.append(order)
         return orders
         
 
