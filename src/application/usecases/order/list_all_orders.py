@@ -1,3 +1,5 @@
+from typing import List
+from domain.entities.order import Order
 from domain.exceptions.order_exceptions import OrderError
 from interfaces.repositories.order_repo import OrderRepository
 
