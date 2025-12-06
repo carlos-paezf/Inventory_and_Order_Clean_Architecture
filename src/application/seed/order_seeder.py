@@ -3,7 +3,7 @@ from typing import Iterable
 from domain.entities.order import Order
 from domain.exceptions.order_exceptions import OrderSeederException
 
-from application.usecases.order.save import SaveOrderUseCase
+from application.usecases.order.save_order import SaveOrderUseCase
 
 from interfaces.repositories.order_repo import OrderRepository
 
