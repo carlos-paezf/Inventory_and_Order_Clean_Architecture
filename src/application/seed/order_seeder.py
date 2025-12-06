@@ -1,9 +1,9 @@
 from typing import Iterable
 
 from domain.entities.order import Order
-from domain.exceptions.order_exceptions import OrderSeederException
 
 from application.usecases.order.save_order import SaveOrderUseCase
+from application.seed.exceptions.order_exceptions import OrderSeederException
 
 from interfaces.repositories.order_repo import OrderRepository
 

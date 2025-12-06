@@ -1,12 +1,3 @@
-class OrderSeederException(Exception):
-    """
-    Description
-    -----------
-    Excepción lanzada cuando ocurre un error al poblar las ordenes.
-    """
-    pass
-
-
 class OrderNotFoundError(Exception):
     def __init__(self, order_id: str) -> None:
         """

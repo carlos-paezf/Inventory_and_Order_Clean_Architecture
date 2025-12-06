@@ -1,12 +1,3 @@
-class InventorySeederException(Exception):
-    """
-    Description
-    -----------
-    Excepción lanzada cuando ocurre un error al poblar el inventario.
-    """
-    pass
-
-
 class ProductNotFoundError(Exception):
     def __init__(self, product_id: str) -> None:
         """
