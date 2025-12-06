@@ -12,6 +12,7 @@ from infrastructure.cli.console_utils import (
 )
 
 from demo.mocks.orders import MOCKS_ORDERS
+from interfaces.adapters.order_presenter import OrderPresenter
 from interfaces.repositories.inventory_repo import InventoryRepository
 from interfaces.repositories.order_repo import OrderRepository
 
@@ -103,7 +104,7 @@ class OrderMenu:
             f"{MAGENTA}>>>{RESET} Ingrese el id de la orden a consultar: "
         )
         order = GetOrderUseCase(self.order_repo).execute(order_id)
-        print(order if order else f"No se encontró la orden con el id {order_id}")
+        print(OrderPresenter.format_order_as_table(order) if order else f"No se encontró la orden con el id {order_id}")
         print(f"{GREEN}\nCaso de uso `Obtener Orden` ha sido ejecutado{RESET}")
 
 
@@ -118,7 +119,7 @@ class OrderMenu:
             print("No se encontraron ordenes")
         else:
             for order in orders:
-                print(order, end="\n\n")
+                print(OrderPresenter.format_order_as_table(order), end="\n\n")
         print(f"{GREEN}\nCaso de uso `Listar Ordenes` ha sido ejecutado{RESET}")
 
 

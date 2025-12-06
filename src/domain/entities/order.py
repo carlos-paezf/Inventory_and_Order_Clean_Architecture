@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from dataclasses import dataclass
 from domain.entities.product import Product
 
@@ -47,7 +47,7 @@ class Order:
     items : List[OrderItem]
         Lista de items de la orden
     """
-    def __init__(self, id, items = []) -> None:
+    def __init__(self, id, items: Optional[List[OrderItem]] = None) -> None:
         """
         Description
         -----------
@@ -57,11 +57,11 @@ class Order:
         ----------
         id : str
             Id del pedido
-        items : List[OrderItem]
+        items : Optional[List[OrderItem]]
             Lista de items de la orden
         """
         self.id: str = id
-        self.items: List[OrderItem] = items
+        self.items: List[OrderItem] = items or []
         
 
     def add_item(self, product: Product, quantity: int) -> None:
@@ -119,24 +119,11 @@ class Order:
         """
         Description
         -----------
-        Devuelve una representación en string de la orden
+        Devuelve una representación en string de la orden para debugging simple
 
         Returns
         -------
         str
             Representación en string de la orden
         """
-        header = f"Detalles de la orden {self.id}:"
-        sub_header = f"{'Producto':<30} {'Cantidad':<10} {'Subtotal':<10}"
-        separator = "-" * len(sub_header)
-
-        rows = []
-        for item in self.items:
-            rows.append(
-                f"{item.product.name:<30} {item.quantity:<10} {item.get_subtotal():<10.2f}"
-            )
-
-        total_line = f"{'TOTAL':<30} {'':<10} {self.calculate_total():<10.2f}"
-
-        table = "\n".join([header, sub_header, separator] + rows + [separator, total_line])
-        return table
+        return f"Orden id: {self.id}. Cantidad de items: {len(self.items)}"
