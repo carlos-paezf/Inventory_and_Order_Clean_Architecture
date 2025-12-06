@@ -1,9 +1,9 @@
 import random
 
-from application.usecases.order.list_all import ListAllOrdersUseCase
-from application.usecases.order.save import SaveOrderUseCase
-from application.usecases.order.delete import DeleteOrderUseCase
-from application.usecases.order.get import GetOrderUseCase
+from application.usecases.order.list_all_orders import ListAllOrdersUseCase
+from application.usecases.order.save_order import SaveOrderUseCase
+from application.usecases.order.delete_order import DeleteOrderUseCase
+from application.usecases.order.get_order import GetOrderUseCase
 
 from demo.mocks.orders import MOCKS_ORDERS
 from interfaces.cli.console_utils import (
