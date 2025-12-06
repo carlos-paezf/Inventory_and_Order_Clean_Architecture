@@ -196,7 +196,7 @@ def capture_product() -> Optional[Product]:
                 f"{MAGENTA}>>>{RESET} Ingrese el autor del producto: "
             )
 
-        return ProductFactory.create_product(
+        return ProductFactory().create_product(
             category,
             id=product_id,
             name=product_name,

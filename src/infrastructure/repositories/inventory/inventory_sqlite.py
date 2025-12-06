@@ -175,6 +175,6 @@ class InventorySQLiteRepository(InventoryRepository):
         """
         id, name, price, category, author, brand = row
 
-        return ProductFactory.create_product(
+        return ProductFactory().create_product(
             kind=category, id=id, name=name, price=float(price), author=author, brand=brand
         )
