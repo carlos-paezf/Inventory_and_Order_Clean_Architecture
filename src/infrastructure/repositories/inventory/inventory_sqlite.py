@@ -1,7 +1,9 @@
+import sqlite3
 from typing import Any, List
 
 from domain.entities.product import AccessoryProduct, BookProduct, Product
 
+from domain.exceptions.inventory_exceptions import InventoryError, ProductAlreadyExistsError, ProductNotFoundError
 from infrastructure.sqlite_connection import SQLiteConnection
 
 from interfaces.adapters.product_factory import ProductFactory
@@ -54,6 +56,13 @@ class InventorySQLiteRepository(InventoryRepository):
         ----------
         product : Product
             Producto a insertar
+
+        Raise
+        -----
+        ProductAlreadyExistsError
+            Excepción lanzada cuando se intenta insertar un producto que ya existe.
+        InventoryError
+            Excepción lanzada cuando ocurre un error al insertar el producto.
         """
         query = """
             INSERT INTO products (id, name, price, category, author, brand) 
@@ -62,11 +71,16 @@ class InventorySQLiteRepository(InventoryRepository):
         author = product.author if isinstance(product, BookProduct) else None
         brand = product.brand if isinstance(product, AccessoryProduct) else None
 
-        self.conn.execute(
-            query,
-            (product.id, product.name, product.price, product.category, author, brand)
-        )
-        self.conn.commit()
+        try:
+            self.conn.execute(
+                query,
+                (product.id, product.name, product.price, product.category, author, brand)
+            )
+            self.conn.commit()
+        except sqlite3.IntegrityError:
+            raise ProductAlreadyExistsError(product.id)
+        except Exception as e:
+            raise InventoryError(str(e))
 
 
     def remove_product(self, product_id: str) -> bool:
@@ -84,10 +98,17 @@ class InventorySQLiteRepository(InventoryRepository):
         -------
         bool
             Retorna True si el producto fue eliminado, False en caso contrario.
+
+        Raise
+        -----
+        ProductNotFoundError
+            Excepción lanzada cuando no se encuentra un producto con el id especificado.
         """
         result = self.conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
         self.conn.commit()
-        return result.rowcount >= 0
+        if result.rowcount == 0:
+            raise ProductNotFoundError(product_id)
+        return True
         
 
 
