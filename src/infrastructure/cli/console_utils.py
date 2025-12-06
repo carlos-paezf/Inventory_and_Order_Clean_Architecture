@@ -1,11 +1,14 @@
 import os
 import sys
-from typing import Sequence
+
+from typing import Optional, Sequence
 
 from application.usecases.inventory.add_product import AddProductUseCase
 from application.usecases.inventory.get_product import GetProductUseCase
+
 from domain.entities.order import Order
 from domain.entities.product import Product
+
 from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.inventory_repo import InventoryRepository
 
@@ -57,7 +60,7 @@ def read_option(n_options: int) -> int:
         )
 
 
-def capture_product() -> Product:
+def capture_product() -> Optional[Product]:
     """
     Description
     -----------
@@ -65,7 +68,7 @@ def capture_product() -> Product:
 
     Returns
     -------
-    Product
+    Optional[Product]
         Producto creado
     """
     while True:
@@ -131,7 +134,7 @@ def capture_product() -> Product:
         )
 
 
-def capture_order(inventory_repo: InventoryRepository) -> Order:
+def capture_order(inventory_repo: InventoryRepository) -> Optional[Order]:
     """
     Description
     -----------
@@ -144,7 +147,7 @@ def capture_order(inventory_repo: InventoryRepository) -> Order:
 
     Returns
     -------
-    Order
+    Optional[Order]
         Orden creada
     """
     while True:
