@@ -36,7 +36,7 @@ class InventorySQLiteRepository(InventoryRepository):
             CREATE TABLE IF NOT EXISTS products (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
-                price TEXT NOT NULL,
+                price REAL NOT NULL,
                 category TEXT NOT NULL,
                 author TEXT,
                 brand TEXT
