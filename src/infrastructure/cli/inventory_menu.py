@@ -3,13 +3,10 @@ from application.usecases.inventory.get_product import GetProductUseCase
 from application.usecases.inventory.list_products import ListProductsUseCase
 from application.usecases.inventory.remove_product import RemoveProductUseCase
 
-from domain.entities.product import Product
-
 from infrastructure.cli.console_utils import (
-    GREEN, MAGENTA, RED, RESET, YELLOW, pause, show_menu_options, read_option
+    GREEN, MAGENTA, RESET, YELLOW, capture_product, pause, show_menu_options, read_option
 )
 
-from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 class InventoryMenu:
@@ -82,86 +79,12 @@ class InventoryMenu:
         Ejecuta el caso de uso `Añadir producto`.
         """
         # TODO: Añadir el flujo de inserción manual de productos
-        product = self._capture_product()
+        product = capture_product()
         if product is None:
             print(f"{YELLOW}Nota:{RESET} No se ha creado ningún producto")
             return
         AddProductUseCase(self.inventory_repo).execute(product)
         print(f"{GREEN}\nCaso de uso `Añadir producto` ha sido ejecutado{RESET}")
-
-    
-    def _capture_product(self) -> Product:
-        """
-        Description
-        -----------
-        Captura los datos de un producto.
-
-        Returns
-        -------
-        Product
-            Producto creado
-        """
-        while True:
-            print(
-                f"{GREEN}\nTe presentamos los tipos de categorías disponibles para el producto:"
-                f"{RESET} (Selecciona una opción)"
-            )
-
-            options = [
-                "Accesorio",
-                "Libro",
-                "Otro",
-                "Volver atrás"
-            ]
-
-            show_menu_options(options, exit_label="Salir de la demo")
-            option = read_option(len(options))
-
-            category = ""
-
-            if option == 1:
-                category = "accessory"
-            elif option == 2:
-                category = "book"
-            elif option == 4:
-                return
-
-            product_id = input(
-                f"{MAGENTA}>>>{RESET} Ingrese el id del producto: "
-            )
-            product_name = input(
-                f"{MAGENTA}>>>{RESET} Ingrese el nombre del producto: "
-            )
-            
-            while True:
-                try:
-                    product_price = float(input(
-                        f"{MAGENTA}>>>{RESET} Ingrese el precio del producto: "
-                    ))
-                    break
-                except ValueError:
-                    print(f"{RED}Error:{RESET} El precio debe ser un número válido.")
-            
-            product_brand = None
-            product_author = None
-
-            if category == "accessory":
-                product_brand = input(
-                    f"{MAGENTA}>>>{RESET} Ingrese la marca del producto: "
-                )
-            elif category == "book":
-                product_author = input(
-                    f"{MAGENTA}>>>{RESET} Ingrese el autor del producto: "
-                )
-
-            return ProductFactory().create_product(
-                category,
-                id=product_id,
-                name=product_name,
-                price=product_price,
-                brand=product_brand,
-                author=product_author
-            )
 
 
     def _get_product(self) -> None:

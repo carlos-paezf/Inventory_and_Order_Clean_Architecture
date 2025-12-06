@@ -5,12 +5,14 @@ from application.usecases.order.save_order import SaveOrderUseCase
 from application.usecases.order.delete_order import DeleteOrderUseCase
 from application.usecases.order.get_order import GetOrderUseCase
 
+from domain.entities.order import Order
 from infrastructure.cli.console_utils import (
-    GREEN, MAGENTA, RESET,
+    GREEN, MAGENTA, RESET, capture_order,
     pause, show_menu_options, read_option
 )
 
 from demo.mocks.orders import MOCKS_ORDERS
+from interfaces.repositories.inventory_repo import InventoryRepository
 from interfaces.repositories.order_repo import OrderRepository
 
 
@@ -26,7 +28,7 @@ class OrderMenu:
         Repositorio de ordenes.
     """
     
-    def __init__(self, order_repo: OrderRepository) -> None:
+    def __init__(self, order_repo: OrderRepository, inventory_repo: InventoryRepository) -> None:
         """
         Description
         -----------
@@ -38,6 +40,7 @@ class OrderMenu:
             Repositorio de ordenes.
         """
         self.order_repo = order_repo
+        self.inventory_repo = inventory_repo
 
 
     def run(self) -> None:
@@ -84,10 +87,9 @@ class OrderMenu:
         -----------
         Ejecuta el caso de uso `Guardar Orden`.
         """
-        # TODO: Añadir el flujo de inserción manual de ordenes
-        random_order = random.choice(MOCKS_ORDERS)
-        SaveOrderUseCase(self.order_repo).execute(random_order)
-        print(f"La orden {random_order.id} ha sido guardada con éxito")
+        order = capture_order(self.inventory_repo)
+        SaveOrderUseCase(self.order_repo).execute(order)
+        print(f"La orden {order.id} ha sido guardada con éxito")
         print(f"{GREEN}\nCaso de uso `Guardar Orden` ha sido ejecutado{RESET}")
 
 
