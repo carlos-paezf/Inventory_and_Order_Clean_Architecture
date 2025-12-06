@@ -12,6 +12,183 @@
 - Testing
 - Documentación
 
+## Patrones de diseño implementados
+
+### Patrones Creacionales
+
+#### Factory Method (ProductFactory)
+
+Dónde:
+
+- `Interfaces.Adapters.ProductFactory`
+- Método: `create_product(kind: str, **kwargs): Product`
+
+Qué hace:
+
+- Según el `kind` (`"book"`, `"accessory"`, etc.) devuelve una instancia de:
+    - `BookProduct`
+    - `AccessoryProduct`
+    - `Product` genérico
+
+Por qué es Factory Method:
+
+- Un método que decide en tiempo de ejecución qué subtipo de `Product` crear.
+- Encapsula la lógica de construcción y respeta el polimorfismo.
+- El código cliente no necesita saber qué subclase instanciar ni cómo.
+
+#### Singleton (SQLiteConnection)
+
+Dónde:
+
+- `Infrastructure.Repositories.SQLiteConnection`
+
+Qué hace:
+
+- Asegura que en toda la aplicación se use una sola instancia de conexión a la base de datos SQLite.
+- Usa un atributo de clase `_instance` y un `Lock` para control de concurrencia.
+
+Por qué es Singleton:
+
+- El método `__new__` controla que solo se cree una instancia.
+- El resto de clases (repositorios SQLite) piden la conexión vía `get_connection()`, no crean conexiones nuevas.
+
+### Patrones estructurales
+
+#### Repository (InventoryRepository, OrderRepository + implementaciones)
+
+Dónde:
+
+- Interfaces:
+    - `Interfaces.Repositories.InventoryRepository`
+    - `Interfaces.Repositories.OrderRepository`
+- Implementaciones:
+    - `Infrastructure.Repositories.InventoryMemoryRepository`
+    - `Infrastructure.Repositories.InventorySQLiteRepository`
+    - `Infrastructure.Repositories.OrderMemoryRepository`
+    - `Infrastructure.Repositories.OrderSQLiteRepository`
+
+Qué hace:
+
+- Oculta los detalles de persistencia (memoria vs SQLite).
+- Expone una interfaz orientada al dominio:
+    - `add_product`, `get_product`, `list_products`, `remove_product`
+    - `save`, `get`, `list_all`, `delete`
+
+Por qué es Repository:
+
+- El dominio y los use cases trabajan con una colección de entidades como si fuera una lista o colección en memoria.
+- No dependen de SQL, diccionarios, ni detalles de almacenamiento.
+
+#### Presenter / ViewModel (OrderPresenter)
+
+Dónde:
+
+- `Interfaces.Adapters.OrderPresenter`
+- Método: `format_order_as_table(order: Order): str`
+
+Qué hace:
+
+- Toma una entidad de dominio (`Order`) y la transforma en una representación de salida (tabla de texto para la CLI).
+- Separa la forma de mostrar la orden de la lógica de negocio.
+
+Por qué es un Presenter:
+
+- Es un adaptador de presentación típico de Clean Architecture: dominio → modelo de vista / string listo para la UI.
+
+#### Ports & Adapters (Arquitectura de puertos)
+
+Dónde:
+
+- Puertos (interfaces):
+    - `InventoryRepository`, `OrderRepository`
+- Adaptadores:
+    - Repositorios en memoria / SQLite
+    - `ProductFactory`, `OrderPresenter`
+    - `InventoryMenu`, `OrderMenu`, `MenuManager`
+
+Qué hace:
+
+- Separa el núcleo (dominio + use cases) de:
+    - la UI (CLI),
+    - la persistencia (memoria / SQLite),
+    - la creación de objetos, etc.
+
+Por qué es Ports & Adapters:
+
+- El dominio y la capa de aplicación solo conocen interfaces, no detalles concretos.
+- Las clases de infraestructura se “enchufan” implementando esas interfaces.
+
+### Patrones de comportamiento
+
+#### Strategy (elección de persistencia en tiempo de ejecución)
+
+Dónde:
+
+- `MenuManager._select_persistence()` Elige entre:
+    - `InventoryMemoryRepository` / `OrderMemoryRepository`
+    - `InventorySQLiteRepository` / `OrderSQLiteRepository`
+
+Qué hace:
+
+- Permite cambiar la “estrategia” de persistencia (memoria vs BD) en tiempo de ejecución.
+- El resto del sistema interactúa solo con `InventoryRepository` y `OrderRepository`.
+
+Por qué se parece a Strategy:
+
+- `InventoryRepository` y `OrderRepository` actúan como la interfaz de estrategia.
+- Las implementaciones concretas son las estrategias (memoria / SQLite).
+- `MenuManager` selecciona qué estrategia usar según la opción del usuario.
+
+> *(Es Strategy + Repository + Dependency Inversion, todo amiguitos 💚.)*
+
+#### Application Service / Use Case (similar a Command)
+
+Dónde:
+
+- `Application.UseCases.Inventory.*`
+    - `AddProductUseCase`, `GetProductUseCase`, `ListProductsUseCase`, `RemoveProductUseCase`
+- `Application.UseCases.Order.*`
+    - `SaveOrderUseCase`, `GetOrderUseCase`, `ListAllOrdersUseCase`, `DeleteOrderUseCase`
+
+Qué hace:
+
+- Cada clase representa un caso de uso de la aplicación.
+- Encapsula un proceso de negocio en el método `execute(...)`.
+- Coordina repositorios, manejo de errores y reglas de aplicación.
+
+Por qué es un patrón:
+
+- Es el típico patrón de Application Service / Use Case de Clean Architecture y DDD.
+- Muy parecido al patrón Command (un objeto por operación), pero con semántica de caso de uso.
+
+### Patrones arquitectónicos
+
+#### Clean Architecture / Capas + Dependency Inversion
+
+Dónde:
+
+- Paquetes:
+    - `Domain.Entities`, `Domain.Exceptions`
+    - `Application.UseCases.*`, `Application.Seeder`
+    - `Interfaces.Adapters`, `Interfaces.Repositories`
+    - `Infrastructure.Repositories`, `Infrastructure.CLI`
+
+Qué hace:
+
+- Separa el sistema en capas:
+    - Dominio (reglas de negocio puras).
+    - Casos de uso (orquestación de reglas).
+    - Interfaces (puertos, adaptadores, presenters, factories).
+    - Infraestructura (detalles concretos: CLI, SQLite, memoria).
+- El flujo de dependencias es hacia adentro (infra → interfaces → application → domain), también se le conoce como Onion Architecture.
+
+Por qué es un patrón arquitectónico:
+
+- Sigue el principio de Dependency Inversion:
+    - El dominio define las abstracciones (interfaces).
+    - La infraestructura implementa los detalles.
+- Esto permite cambiar UI, BD o factories sin romper el corazón del sistema.
+
 ## Visualización Diagrama de clases
 
 > Haz clic sobre el enlace para ver más (Redirige a Mermaid Live Editor)
