@@ -35,8 +35,7 @@ class GetProductUseCase:
             En caso de encontrar un registro, retorna un producto.
             En caso contrario retorna None
         """
-        product = self.inventory_repo.get_product(product_id)
-        if product is None:
-            print(f"404 - El producto con el id {product_id} no fue encontrado")
-        else:
-            print(f"200 - El producto [{product}] ha sido encontrado")
+        try:
+            return self.inventory_repo.get_product(product_id)
+        except Exception as e:
+            raise InventoryError(str(e))

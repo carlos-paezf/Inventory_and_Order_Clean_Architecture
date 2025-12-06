@@ -1,4 +1,5 @@
 from domain.entities.product import Product
+from domain.exceptions.inventory_exceptions import InventoryError, ProductAlreadyExistsError
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
@@ -17,7 +18,7 @@ class AddProductUseCase:
         self.inventory_repo = inventory_repo
 
 
-    def execute(self, product: Product):
+    def execute(self, product: Product) -> None:
         """
         Description
         -----------
@@ -29,5 +30,9 @@ class AddProductUseCase:
         product : Product
             Producto a registrar en la persistencia.
         """
-        self.inventory_repo.add_product(product)
-        print(f"200 - El producto [{product}] ha sido añadido correctamente")
+        try:
+            self.inventory_repo.add_product(product)
+        except ProductAlreadyExistsError as e:
+            raise ProductAlreadyExistsError(e.product_id)
+        except InventoryError as e:
+            raise InventoryError(e)

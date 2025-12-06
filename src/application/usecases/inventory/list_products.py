@@ -1,3 +1,5 @@
+from typing import List
+from domain.entities.product import Product
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
@@ -15,14 +17,19 @@ class ListProductsUseCase:
         """
         self.inventory_repo = inventory_repo
 
-    def execute(self):
+    def execute(self) -> List[Product]:
         """
         Description
         -----------
         Caso de uso agnóstico para añadir un producto en la persistencia. 
         Se hace uso del repositorio para ejecutar una función específica.
+
+        Returns
+        -------
+        List[Product]
+            Retorna una lista de productos.
         """
-        products = self.inventory_repo.list_products()
-        print(f"200 - Listado de productos guardados en la persistencia")
-        for i, product in enumerate(products):
-            print(f"\t{i+1}. {product}")
+        try:
+            return self.inventory_repo.list_products()
+        except Exception as e:
+            raise InventoryError(str(e))
