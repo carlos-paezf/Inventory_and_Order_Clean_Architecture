@@ -3,7 +3,7 @@ from typing import List
 from domain.entities.order import Order, OrderItem
 from domain.entities.product import Product
 
-from infrastructure.sqlite_connection import SQLiteConnection
+from infrastructure.database.sqlite_connection import SQLiteConnection
 
 from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.order_repo import OrderRepository

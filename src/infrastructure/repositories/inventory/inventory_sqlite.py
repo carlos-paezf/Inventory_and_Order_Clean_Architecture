@@ -2,9 +2,9 @@ import sqlite3
 from typing import Any, List
 
 from domain.entities.product import AccessoryProduct, BookProduct, Product
+from domain.exceptions.inventory_exceptions import InventoryError, ProductAlreadyExistsError
 
-from domain.exceptions.inventory_exceptions import InventoryError, ProductAlreadyExistsError, ProductNotFoundError
-from infrastructure.sqlite_connection import SQLiteConnection
+from infrastructure.database.sqlite_connection import SQLiteConnection
 
 from interfaces.adapters.product_factory import ProductFactory
 from interfaces.repositories.inventory_repo import InventoryRepository
