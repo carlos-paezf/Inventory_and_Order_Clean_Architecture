@@ -1,5 +1,6 @@
 import unittest
 from interfaces.repositories.inventory_repo import InventoryRepository
+from domain.exceptions.inventory_exceptions import ProductAlreadyExistsError
 from demo.mocks.products import MOCKS_PRODUCTS
 
 class NotTested:
@@ -51,5 +52,5 @@ class NotTested:
             # Have the same ID to raise error
             expected.id = existing.id
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ProductAlreadyExistsError):
                 self.repository.add_product(expected)
