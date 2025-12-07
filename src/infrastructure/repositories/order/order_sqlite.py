@@ -10,13 +10,15 @@ from interfaces.repositories.order_repo import OrderRepository
 
 
 class OrderSQLiteRepository(OrderRepository):
-    def __init__(self) -> None:
+    # TODO: Maybe get the default db_path from an env variable
+    def __init__(self, db_path: str = "database.db", uri: bool = False) -> None:
+        # TODO: Document db_path argument
         """
         Description
         -----------
         Inicializa el repositorio en SQLite
         """
-        self.conn = SQLiteConnection().get_connection()
+        self.conn = SQLiteConnection(db_path = db_path, uri = uri).get_connection()
         self._create_tables()
 
 
