@@ -1,3 +1,5 @@
+from typing import List
+from domain.entities.order import Order
 from domain.exceptions.order_exceptions import OrderError
 from interfaces.repositories.order_repo import OrderRepository
 
@@ -16,11 +18,17 @@ class ListAllOrdersUseCase:
         """
         self.order_repo = order_repo
 
-    def execute(self):
+
+    def execute(self) -> List[Order]:
         """
         Description
         -----------
         Lista todos los pedidos guardados en la persistencia
+
+        Returns
+        -------
+        List[Order]
+            Lista de ordenes guardadas en la persistencia
         """
         try:
             return self.order_repo.list_all()

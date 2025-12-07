@@ -1,6 +1,9 @@
 from typing import Iterable
-from application.usecases.order.save_order import SaveOrderUseCase
 from domain.entities.order import Order
+
+from application.usecases.order.save_order import SaveOrderUseCase
+from application.seed.exceptions.order_exceptions import OrderSeederException
+
 from interfaces.repositories.order_repo import OrderRepository
 
 
@@ -33,7 +36,13 @@ class OrderSeeder:
             Arreglo de Ordenes a persistir
         ignore_errors: bool = True
             Mientras esté activa esta bandera, solo se alertan de los errores
-            pero no se detiene la aplicación. En caso contrario, 
+            pero no se detiene la aplicación. En caso contrario, lanza una
+            excepción.
+
+        Raise
+        -----
+        OrderSeederException
+            Si ocurre un error al poblar las ordenes.
         """
         for order in orders:
             try:
@@ -42,4 +51,4 @@ class OrderSeeder:
                 if ignore_errors:
                     print(f"[OrderSeeder] No se pudo insertar el pedido {order.id}: {exc}")
                     continue
-                raise
+                raise OrderSeederException(f"Error al poblar las ordenes: {exc}")

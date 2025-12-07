@@ -1,3 +1,4 @@
+from domain.exceptions.inventory_exceptions import ProductNotFoundError
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
@@ -15,7 +16,8 @@ class RemoveProductUseCase:
         """
         self.inventory_repo = inventory_repo
 
-    def execute(self, product_id: str):
+
+    def execute(self, product_id: str) -> bool:
         """
         Description
         -----------
@@ -27,15 +29,19 @@ class RemoveProductUseCase:
         product_id : str
             Id del producto a eliminar de la persistencia.
 
+        Returns
+        -------
+        bool
+            True si el producto fue eliminado, False si no.
+
         Raises
         ------
+        ProductNotFoundError
+            Si el producto no se encuentra en la persistencia.
         ValueError
             Si ocurre un error al eliminar el producto.
         """
         try:
-            if self.inventory_repo.remove_product(product_id):
-                print("200 - El producto ha sido eliminado correctamente")
-            else:
-                print(f"404 - El producto con el id {product_id} no fue encontrado")
+            return self.inventory_repo.remove_product(product_id)
         except ValueError as e:
-            print(f"500 - Ha ocurrido un error al eliminar el producto: {e}")
+            raise InventoryError(str(e))

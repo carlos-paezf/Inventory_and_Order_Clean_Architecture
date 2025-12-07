@@ -1,7 +1,10 @@
 from typing import Iterable
 
-from application.usecases.inventory.add_product import AddProductUseCase
 from domain.entities.product import Product
+
+from application.usecases.inventory.add_product import AddProductUseCase
+from application.seed.exceptions.inventory_exceptions import InventorySeederException
+
 from interfaces.repositories.inventory_repo import InventoryRepository
 
 
@@ -44,6 +47,11 @@ class InventorySeeder:
             Iterable de entidades Product (o lo que devuelva tu ProductFactory).
         ignore_errors : bool
             Si True, continúa aunque ocurra un error con algún producto.
+
+        Raise
+        -----
+        InventorySeederException
+            Si ocurre un error al poblar el inventario.
         """
         for product in products:
             try:
@@ -52,4 +60,5 @@ class InventorySeeder:
                 if ignore_errors:
                     print(f"[InventorySeeder] No se pudo insertar el producto {product.id}: {exc}")
                     continue
-                raise
+
+                raise InventorySeederException(f"Error al poblar el inventario: {exc}")

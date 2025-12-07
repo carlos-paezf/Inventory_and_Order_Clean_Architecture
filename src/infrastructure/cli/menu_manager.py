@@ -8,34 +8,70 @@ from infrastructure.repositories.inventory.inventory_memory import InventoryMemo
 from infrastructure.repositories.inventory.inventory_sqlite import InventorySQLiteRepository
 from infrastructure.repositories.order.order_memory import OrderMemoryRepository
 from infrastructure.repositories.order.order_sqlite import OrderSQLiteRepository
-
-from interfaces.cli.console_utils import (
-    GREEN, BLUE, RESET,
+from infrastructure.cli.console_utils import (
+    GREEN, BLUE, RESET, clean_console,
     show_menu_options, read_option,
 )
-from interfaces.cli.inventory_menu import InventoryMenu
-from interfaces.cli.order_menu import OrderMenu
+from infrastructure.cli.inventory_menu import InventoryMenu
+from infrastructure.cli.order_menu import OrderMenu
+
 from interfaces.repositories.inventory_repo import InventoryRepository
 from interfaces.repositories.order_repo import OrderRepository
 
 
 
 class MenuManager:
+    """
+    Description
+    -----------
+    Clase que gestiona el menú principal de la aplicación.
+
+    Attributes
+    ----------
+    EXIT_OPTION : int
+        Constante que define la opción de salida del menú.
+    inventory_repo : InventoryRepository
+        Repositorio de inventario.
+    order_repo : OrderRepository
+        Repositorio de pedidos.
+    """
     EXIT_OPTION = 0
 
     def __init__(self):
+        """
+        Description
+        -----------
+        Inicializa el menú principal de la aplicación.
+
+        Attributes
+        ----------
+        inventory_repo : InventoryRepository
+            Repositorio de inventario.
+        order_repo : OrderRepository
+            Repositorio de pedidos.
+        """
         self.inventory_repo: InventoryRepository = None
         self.order_repo: OrderRepository = None
 
 
     def run(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el menú principal de la aplicación.
+        """
         self._print_welcome()
         self._select_persistence()
         self._execute_seed()
         self._main_menu_loop()
 
     
-    def _execute_seed(self):
+    def _execute_seed(self) -> None:
+        """
+        Description
+        -----------
+        Ejecuta el seeder de la aplicación.
+        """
         print("Ejecución de Seed (Selecciona una opción):")
         
         options = [
@@ -56,7 +92,13 @@ class MenuManager:
         print("\n", "-" * 100)
 
 
-    def _print_welcome(self):
+    def _print_welcome(self) -> None:
+        """
+        Description
+        -----------
+        Imprime el mensaje de bienvenida.
+        """
+        clean_console()
         print(
             f"{GREEN}\n\nBienvenido(a) a la DEMO de inventario y pedidos{RESET}",
             end="\n\n",
@@ -64,6 +106,11 @@ class MenuManager:
 
 
     def _select_persistence(self) -> None:
+        """
+        Description
+        -----------
+        Selecciona la persistencia de datos.
+        """
         print("Configuración inicial de persistencia de datos (Selecciona una opción):")
         
         options = [
@@ -92,7 +139,12 @@ class MenuManager:
         print("\n", "-" * 100)
        
     
-    def _main_menu_loop(self):
+    def _main_menu_loop(self) -> None:
+        """
+        Description
+        -----------
+        Loop principal del menú.
+        """
         while True: 
             print(f"{GREEN}\nSelecciona el módulo de la aplicación con la cual deseas interactuar{RESET}")
             
@@ -107,6 +159,6 @@ class MenuManager:
             if option == 1:
                 InventoryMenu(self.inventory_repo).run()
             elif option == 2:
-                OrderMenu(self.order_repo).run()
+                OrderMenu(self.order_repo, self.inventory_repo).run()
             
             print("\n", "-" * 100)
