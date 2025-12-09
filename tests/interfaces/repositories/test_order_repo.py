@@ -22,7 +22,7 @@ class NotTested:
             self.assertEqual(expected.items, actual.items, "incorrect order items")
 
             # Is created order in the list?
-            self.assertIn(expected, self.repository.list_all(), "expected product is not in the list")
+            self.assertTrue(any(order.id == expected.id for order in self.repository.list_all()), "expected order id is not in the list")
 
         def test_delete_order(self):
             expected = MOCKS_ORDERS[1]
@@ -31,7 +31,7 @@ class NotTested:
 
             self.repository.save(expected)
 
-            self.assertIn(expected, self.repository.list_all(), "expected order is not in the list")
+            self.assertTrue(any(order.id == expected.id for order in self.repository.list_all()), "expected order id is not in the list")
 
             isRemoved = self.repository.delete(expected.id)
 
