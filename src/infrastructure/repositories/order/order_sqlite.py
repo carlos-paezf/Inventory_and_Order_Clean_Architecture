@@ -120,6 +120,8 @@ class OrderSQLiteRepository(OrderRepository):
         Order | None
             Orden si se encuentra, None si no se encuentra.
         """
+
+        # TODO: Maybe improve checking existence performance with exists (https://stackoverflow.com/questions/9755860/valid-query-to-check-if-row-exists-in-sqlite3)
         result = self.conn.execute("SELECT id FROM orders WHERE id = ?", (order_id,))
         row = result.fetchone()
 

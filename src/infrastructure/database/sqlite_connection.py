@@ -44,6 +44,12 @@ class SQLiteConnection:
                     cls._instance.conn = sqlite3.connect(db_path, uri=uri, check_same_thread=False)
         return cls._instance
 
+    @classmethod
+    def destroy(cls):
+        cls._instance = None
+
+    def close(self):
+        self.conn.close()
     
     def get_connection(self) -> sqlite3.Connection:
         """
