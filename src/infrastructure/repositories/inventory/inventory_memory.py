@@ -42,7 +42,7 @@ class InventoryMemoryRepository(InventoryRepository):
             Si el producto ya existe en el repositorio
         """
         if product.id in self._products:
-            raise ProductAlreadyExistsError(product_id)
+            raise ProductAlreadyExistsError(product.id)
         self._products[product.id] = product
 
 

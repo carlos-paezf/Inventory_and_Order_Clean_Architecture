@@ -12,6 +12,16 @@
 - Testing
 - Documentación
 
+## Testing
+
+- Clone the project
+- Install the [UV project manager](https://docs.astral.sh/uv/)
+- Run the following commands to test:
+```
+uv sync
+uv run pytest
+```
+
 ## Patrones de diseño implementados
 
 ### Patrones Creacionales

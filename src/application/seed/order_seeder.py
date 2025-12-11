@@ -1,5 +1,4 @@
 from typing import Iterable
-
 from domain.entities.order import Order
 
 from application.usecases.order.save_order import SaveOrderUseCase

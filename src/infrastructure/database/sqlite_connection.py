@@ -19,7 +19,9 @@ class SQLiteConnection:
     _lock = Lock()
 
 
-    def __new__(cls, db_path: str = "database.db") -> "SQLiteConnection":
+    # TODO: Maybe get the default db_path from an env variable
+    def __new__(cls, db_path: str = "database.db", uri: bool = False) -> "SQLiteConnection":
+        # TODO: Document cls and uri argument
         """
         Description
         -----------
@@ -39,9 +41,15 @@ class SQLiteConnection:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = super(SQLiteConnection, cls).__new__(cls)
-                    cls._instance.conn = sqlite3.connect(db_path, check_same_thread=False)
+                    cls._instance.conn = sqlite3.connect(db_path, uri=uri, check_same_thread=False)
         return cls._instance
 
+    @classmethod
+    def destroy(cls):
+        cls._instance = None
+
+    def close(self):
+        self.conn.close()
     
     def get_connection(self) -> sqlite3.Connection:
         """
